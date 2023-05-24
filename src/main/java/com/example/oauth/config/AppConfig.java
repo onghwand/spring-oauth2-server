@@ -1,4 +1,4 @@
-package com.example.oauth;
+package com.example.oauth.config;
 
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
@@ -6,22 +6,20 @@ import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
-import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.oidc.OidcScopes;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.server.authorization.InMemoryOAuth2AuthorizationConsentService;
+import org.springframework.security.oauth2.server.authorization.InMemoryOAuth2AuthorizationService;
+import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationConsentService;
+import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.client.InMemoryRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.config.ClientSettings;
 import org.springframework.security.oauth2.server.authorization.config.ProviderSettings;
-import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -30,25 +28,9 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Arrays;
 import java.util.UUID;
-//TODO authorizationServerConfigurer로 설정하는법, jwtDecoder 동작방식, client 식별자가 id, client_id 2개인데 각각 어느 상황에서 골라쓰면되는건지
-//proxyBean false 이유 찾아보기
-@Configuration(proxyBeanMethods = false)
-public class AuthorizationServerConfig {
 
-    @Bean
-    @Order(Ordered.HIGHEST_PRECEDENCE) // TODO 필터 선순위인데 이게 선순위가 되어야 하는 이유가 뭐지
-    public SecurityFilterChain authsecurityFilterChain(HttpSecurity http) throws Exception {
-//        OAuth2AuthorizationServerConfigurer<HttpSecurity> authorizationServerConfigurer =
-//                new OAuth2AuthorizationServerConfigurer<>();
-//        http.apply(authorizationServerConfigurer);
-        OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
-        // 진입점 지정
-        http.exceptionHandling(exception -> exception.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login")));
-        // jwt 복호화를 위해, 아랫줄 없으면 토큰 검증 못해서 anonymousUser됨
-        http.oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt);
-        return http.build();
-    }
-
+@Configuration
+public class AppConfig {
     @Bean
     public ProviderSettings providerSettings() {
         return ProviderSettings.builder().issuer("http://localhost:9000").build();
@@ -114,6 +96,16 @@ public class AuthorizationServerConfig {
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
         keyPairGenerator.initialize(2048);
         return keyPairGenerator.generateKeyPair();
+    }
+
+    @Bean
+    public OAuth2AuthorizationService oAuth2AuthorizationService(){
+        return new InMemoryOAuth2AuthorizationService();
+    }
+
+    @Bean
+    public OAuth2AuthorizationConsentService oAuth2AuthorizationConsentService(){
+        return new InMemoryOAuth2AuthorizationConsentService();
     }
 
 }

@@ -1,4 +1,4 @@
-package com.example.oauth;
+package com.example.oauth.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
