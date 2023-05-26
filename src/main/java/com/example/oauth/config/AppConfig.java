@@ -47,7 +47,7 @@ public class AppConfig {
     }
 
     private RegisteredClient getRegisteredClient(String clientId, String clientSecret, String scope1, String scope2) {
-        RegisteredClient oidcClient = RegisteredClient.withId(UUID.randomUUID().toString())
+        return RegisteredClient.withId(UUID.randomUUID().toString())
                 .clientId(clientId)
                 .clientSecret(clientSecret)
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
@@ -62,7 +62,6 @@ public class AppConfig {
                 .scope(scope2)
                 .clientSettings(ClientSettings.builder().requireAuthorizationConsent(true).build())
                 .build();
-        return oidcClient;
     }
 
     // jwkSource를 받아서 jwt를 디코딩하는데

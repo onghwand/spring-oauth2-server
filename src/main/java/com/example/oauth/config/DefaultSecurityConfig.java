@@ -7,8 +7,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.oauth2.server.authorization.InMemoryOAuth2AuthorizationService;
-import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -21,6 +19,8 @@ public class DefaultSecurityConfig {
         http.authorizeRequests(authorizeRequest -> authorizeRequest.anyRequest().authenticated());
         http.formLogin();
         // TODO daoauthenticationprovider 알아보기
+        // DaoAuthenticationProvider는 UserDetailService 이용해서 사용자 이름과 암호를 인증하는 AuthenticationProvider 구현체
+        // DaoAuthenticationProvider는 UserDetailService에서 UserDetails를 찾는다
         DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
         daoAuthenticationProvider.setUserDetailsService(userDetailsService());
         http.authenticationProvider(daoAuthenticationProvider);
